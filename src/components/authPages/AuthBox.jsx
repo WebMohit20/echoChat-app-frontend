@@ -2,8 +2,9 @@ import React,{ useState,useEffect} from "react";
 import { Link } from "react-router-dom";
 import ErrorMessage from "../errorPage/Error";
 import "../../style/auth.css"
+import { validator } from "../../utils/validators";
 
-const AuthBox = ({isRegister,submit})=>{
+const AuthBox = ({isRegister,submit,loading,err})=>{
 
     const [formData, setFormData] = useState({
         name: "",
@@ -11,21 +12,21 @@ const AuthBox = ({isRegister,submit})=>{
         password: "",
         conPassword:""
       });
-    const [error,setError] = useState("")
-    useEffect(()=>{
-        
-    },[formData])
+    const [error,setError] = useState(err)
+    
     function handleSubmit(e){
         e.preventDefault();
-        if(formData.email){
-
-        }
-        if(formData.password.length<6){
-            return setError("Password must be at least 6 character");
-        }
+        
         if(isRegister&&formData.password !== formData.conPassword){
             return setError(" Password not valid ");
         }
+        if(isRegister && formData.name.length<3){
+            return setError(" name must have 3 character ");
+        }
+        if(!validator({email:formData.email,password:formData.password})){
+            return setError(" Invalid email and password ");
+        }
+        
         setError("");
         submit(formData);
         setFormData({
@@ -43,7 +44,7 @@ const AuthBox = ({isRegister,submit})=>{
     return (
         <div className="auth-container">
           <h2 className="title">{isRegister ? "Register" : "Login"}</h2>
-          {error && <ErrorMessage message={error} duration={5000} />}
+          {error && <ErrorMessage message={error} duration={5000} setError={setError} />}
           <form onSubmit={handleSubmit} className="auth-form">
             {isRegister  && (
                 <div className="input-group">
@@ -96,7 +97,10 @@ const AuthBox = ({isRegister,submit})=>{
               </div>
               )
             }
-            <button type="submit" >{isRegister ? "Register" : "Login"}</button>
+            <button 
+                type="submit"
+              disabled={loading}>
+                {isRegister ? loading ? "Logging in...":"Register" :loading ? "Logging in...": "Login"}</button>
             {isRegister?
             <p 
                 className="login"

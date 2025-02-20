@@ -1,14 +1,23 @@
 import AuthBox from "./AuthBox"
-import {Link} from "react-router-dom"
+import { useNavigate } from 'react-router-dom';
+import {useSelector,useDispatch} from "react-redux";
+import { registerUser } from "../../redux/features/authSlice";
+
+
  const Register = ()=>{
-    function handleRegister(data){
-      console.log(data)
-    }
+  const {loading,error} = useSelector(state=>state.auth)
+  const dispatch = useDispatch(); 
+  const navigate = useNavigate();
+  function handleRegister(data){
+    dispatch(registerUser({userDetails:data,navigate}))
+  }
   return (
     <div>
       <AuthBox 
         isRegister={true} 
-        submit = {handleRegister} 
+        submit = {handleRegister}
+        loading = {loading}
+        err = {error} 
       />
       
     </div>
